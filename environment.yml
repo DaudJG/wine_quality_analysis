@@ -1,0 +1,16 @@
+name: tcenv
+channels:
+  - defaults
+dependencies:
+  - python=3.10
+  - ipykernel
+  - notebook
+  - pandas
+  - numpy
+  - matplotlib
+  - seaborn
+  - statsmodels
+  - scipy
+  - pingouin
+  - scikit-learn
+  - dash
