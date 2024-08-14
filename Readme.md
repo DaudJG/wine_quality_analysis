@@ -65,13 +65,13 @@ An interactive dashboard built using Dash allows users to explore the dataset an
 
 4. **Run the Jupyter Notebook for the analysis**:  
    ```bash
-   jupyter notebook notebook.ipynb
+   jupyter notebook wine_quality_analysis.ipynb
    ```
 
 5. **Run the Dash Dashboard**:  
    ```bash
    python app.py
    ```  
-   Open your web browser and go to `http://127.0.0.1:8050/` to interact with the dashboard.
+   CLick the link on your terminal it will redirect you to your web browser and able you to interact with the dashboard.
 
 This README provides a complete overview of the project, including how to interact with the analysis and dashboard.
