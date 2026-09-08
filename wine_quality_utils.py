@@ -274,14 +274,14 @@ def plot_diagnostic_plots(model: sm.OLS) -> None:
     ax[1, 0].axhline(0, linestyle='--', color='gray', linewidth=2)
     ax[1, 0].set_xlabel('Fitted values')
     ax[1, 0].set_ylabel('Sqrt(|Standardized Residuals|)')
-    ax[1, 0].setTitle('Scale-Location')
+    ax[1, 0].set_title('Scale-Location')
 
     leverage = model.get_influence().hat_matrix_diag
     ax[1, 1].scatter(leverage, model.get_influence().resid_studentized_internal)
     ax[1, 1].axhline(0, linestyle='--', color='gray', linewidth=2)
     ax[1, 1].set_xlabel('Leverage')
     ax[1, 1].set_ylabel('Standardized Residuals')
-    ax[1, 1].setTitle('Residuals vs Leverage')
+    ax[1, 1].set_title('Residuals vs Leverage')
 
     leverage_threshold = 2 * model.df_model / len(model.fittedvalues)
     for i in np.where((leverage > leverage_threshold) | (np.abs(model.get_influence().resid_studentized_internal) > 2))[0]:

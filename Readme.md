@@ -1,77 +1,36 @@
-# Wine Quality Analysis
+# Wine quality analysis
 
-This repository contains a comprehensive analysis of the Wine Quality dataset. The analysis explores the key factors influencing wine quality, including data exploration, statistical analysis, and predictive modeling. Additionally, a Dash-based interactive dashboard is provided to visualize key insights and allow users to explore the data dynamically.
+A personal learning project using Python to explore red-wine measurements and quality ratings. It includes a statistical-analysis notebook and a Dash dashboard for exploring the data.
 
-## Table of Contents
+## What is implemented
 
-1. [Introduction](#introduction)  
-2. [Data Analysis](#data-analysis)  
-   - Univariate and Bivariate Analysis  
-   - Correlation and Statistical Insights  
-3. [Predictive Modeling](#predictive-modeling)  
-4. [Interactive Dashboard](#interactive-dashboard)  
-5. [Conclusion and Next Steps](#conclusion-and-next-steps)  
-6. [How to Run the Project](#how-to-run-the-project)  
+- Distribution plots, outlier checks and correlation analysis.
+- Train/test preprocessing and statistical modelling helpers in `wine_quality_utils.py`.
+- A dashboard with feature selectors, histograms, scatter plots and a sample of the data.
 
-## Introduction
+The dashboard displays observations. It does not serve a prediction model. Associations in this dataset are not causal evidence or advice to consumers and winemakers.
 
-The goal of this project is to identify the physicochemical properties of wines that most significantly impact their quality. The analysis is structured to guide both consumers and winemakers in making data-driven decisions.
+## Run locally
 
-## Data Analysis
+Use Python 3.12 and [uv](https://docs.astral.sh/uv/).
 
-- **Univariate and Bivariate Analysis**: Exploration of individual features and their relationships with wine quality.  
-- **Correlation and Statistical Insights**: Identification of key predictors like alcohol content, volatile acidity, and sulphates.  
+```bash
+git clone https://github.com/DaudJG/wine_quality_analysis.git
+cd wine_quality_analysis
+uv sync --locked --python 3.12
+uv run python app.py
+```
 
-## Predictive Modeling
+Open `http://127.0.0.1:8050`. Select two features to change the histogram and scatter plot. The second tab shows sample records and an additional scatter plot.
 
-Multiple regression models were developed to predict wine quality. These models were evaluated for their predictive power and ability to generalize.
+`wine_quality_analysis.ipynb` contains the analysis. Open it with a notebook editor using this repository's `.venv` Python interpreter. `environment.yml` is the earlier Conda setup; `pyproject.toml` and `uv.lock` define the maintained environment.
 
-## Interactive Dashboard
+## Data and limitations
 
-An interactive dashboard built using Dash allows users to explore the dataset and key insights visually.
+The supplied `winequality-red.csv` contains physicochemical measurements and quality ratings from the [UCI Wine Quality dataset](https://archive.ics.uci.edu/dataset/186/wine+quality). Attribute the source dataset when reusing it. This project is for learning and has not been validated for production decisions.
 
-### Features of the Dashboard:
+Notebook results depend on the split, model and evaluation settings. The dashboard does not imply deployed model performance or business impact.
 
-- **Feature Selection and Visualization**: Users can select different features to visualize their distributions and relationships.  
-- **Dynamic Graphs**: Includes histograms, scatter plots, and more, updated based on user input.  
-- **Insights Report**: A summary of the key findings and recommendations is provided directly in the dashboard.  
+## Verification
 
-## Conclusion and Next Steps
-
-- **Key Insights**: Alcohol, volatile acidity, and sulphates are identified as the most significant features influencing wine quality.  
-- **Next Steps**: Further exploration of non-linear models, outlier treatment, and additional data collection are recommended.
-
-## How to Run the Project
-
-1. **Clone the repository**:  
-   ```bash
-   git clone https://github.com/yourusername/wine-quality-analysis.git
-   ```
-
-2. **Navigate to the project directory**:  
-   ```bash
-   cd wine-quality-analysis
-   ```
-
-3. **Set up the environment**:  
-   Create the conda environment using the `environment.yml` file:  
-   ```bash
-   conda env create -f environment.yml
-   ```  
-   Activate the environment:  
-   ```bash
-   conda activate tcenv
-   ```
-
-4. **Run the Jupyter Notebook for the analysis**:  
-   ```bash
-   jupyter notebook wine_quality_analysis.ipynb
-   ```
-
-5. **Run the Dash Dashboard**:  
-   ```bash
-   python app.py
-   ```  
-   CLick the link on your terminal it will redirect you to your web browser and able you to interact with the dashboard.
-
-This README provides a complete overview of the project, including how to interact with the analysis and dashboard.
+On 8 September 2026, the maintained environment was checked with all 103 notebook code cells run sequentially, the dashboard's three HTTP endpoints, two plot selections and the modelling helper's held-out prediction path. Two diagnostic-plot method typos were corrected. These are execution checks, not independent validation of predictive performance or scientific conclusions. Saved notebook outputs have not been replaced.

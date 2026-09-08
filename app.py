@@ -3,24 +3,21 @@ from dash import dcc, html
 from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
+from pathlib import Path
 
-df = pd.read_csv('winequality-red.csv')
+df = pd.read_csv(Path(__file__).resolve().parent / 'winequality-red.csv')
 df.columns = df.columns.str.title()
 
 report_content = """
-## Insights from the Data
+## Explore the wine quality dataset
 
-- **Key Indicators**: Alcohol, volatile acidity, and sulphates are among the most important features influencing wine quality.
-- **Correlations**: Alcohol shows a strong positive correlation with quality, while volatile acidity shows a negative correlation.
-- **Outliers and Skewness**: Some features exhibit significant skewness and outliers, impacting the correlation and regression analysis.
+Choose two measurements to inspect their distributions and relationship to the
+quality rating. Each point represents a record in the supplied red-wine dataset.
 
----
-
-### Conclusion
-
-- **Statistical Significance**: Significant differences in alcohol content between high-quality and low-quality wines.
-- **Consumer Advice**: Prefer wines with 11.4%-11.7% alcohol for higher quality.
-- **Winemaking Tip**: Target the 11-11.5% alcohol range for potentially higher-quality wines.
+This is an educational analysis of observational data. Associations in this sample
+do not establish causes or support recommendations for changing a wine's alcohol
+content. The notebook contains the statistical modelling work; this dashboard
+explores the recorded measurements and does not generate predictions.
 """
 
 app = dash.Dash(__name__)
@@ -68,12 +65,12 @@ app.layout = html.Div([
         
         dcc.Tab(label='Data & Additional Insights', children=[
             html.Div([
-                html.H4("Sample Data:"),
+                html.H4("Sample data"),
                 dcc.Markdown(df.head().to_markdown(), style={'padding': '20px', 'backgroundColor': '#f9f9f9', 'border': '1px solid #ccc'}),
 
                 # Additional meaningful graph from the notebook
                 html.Div([
-                    html.H4("Volatile Acidity vs Alcohol (Impact on Quality)"),
+                    html.H4("Volatile acidity and alcohol by quality rating"),
                     dcc.Graph(id='additional-plot')
                 ], style={'padding': '20px 0'})
             ])
@@ -109,7 +106,7 @@ def update_plots(feature1, feature2):
 def generate_additional_plot(_):
     additional_fig = px.scatter(
         df, x='Volatile Acidity', y='Alcohol', color='Quality',
-        title='Volatile Acidity vs Alcohol (Impact on Quality)',
+        title='Volatile acidity and alcohol by quality rating',
         labels={'Volatile Acidity': 'Volatile Acidity', 'Alcohol': 'Alcohol'},
         color_continuous_scale=px.colors.sequential.Viridis
     )
@@ -117,4 +114,4 @@ def generate_additional_plot(_):
     return additional_fig
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run(debug=False)
