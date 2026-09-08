@@ -5,6 +5,7 @@ description = "Educational wine data analysis and an interactive Dash dashboard"
 requires-python = ">=3.12,<3.14"
 dependencies = [
   "dash>=3,<4",
+  "plotly>=6,<7",
   "pandas>=2.2,<3",
   "numpy>=1.26,<3",
   "matplotlib>=3.8,<4",

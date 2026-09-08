@@ -1,36 +1,44 @@
 # Wine quality analysis
 
-A personal learning project using Python to explore red-wine measurements and quality ratings. It includes a statistical-analysis notebook and a Dash dashboard for exploring the data.
+A personal learning project exploring red-wine measurements and quality ratings with Python. It contains a statistical-analysis notebook and a Dash dashboard for exploring observations.
 
-## What is implemented
+## What to inspect
 
-- Distribution plots, outlier checks and correlation analysis.
-- Train/test preprocessing and statistical modelling helpers in `wine_quality_utils.py`.
-- A dashboard with feature selectors, histograms, scatter plots and a sample of the data.
+- `wine_quality_analysis.ipynb`: distributions, correlations, hypothesis tests, regression diagnostics and binary classification.
+- `wine_quality_utils.py`: plotting and modelling helpers.
+- `app.py`: feature selectors, histograms, scatter plots and sample records. The dashboard does not serve a prediction model.
 
-The dashboard displays observations. It does not serve a prediction model. Associations in this dataset are not causal evidence or advice to consumers and winemakers.
+## Setup on Windows or Linux
 
-## Run locally
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/) and Git. These commands work in PowerShell or a Linux shell:
 
-Use Python 3.12 and [uv](https://docs.astral.sh/uv/).
-
-```bash
+```text
 git clone https://github.com/DaudJG/wine_quality_analysis.git
 cd wine_quality_analysis
-uv sync --locked --python 3.12
-uv run python app.py
+uv sync --locked
+uv run --locked python app.py
 ```
 
-Open `http://127.0.0.1:8050`. Select two features to change the histogram and scatter plot. The second tab shows sample records and an additional scatter plot.
+Open http://127.0.0.1:8050. Select two measurements on the first tab; the second tab shows sample data and another scatter plot.
 
-`wine_quality_analysis.ipynb` contains the analysis. Open it with a notebook editor using this repository's `.venv` Python interpreter. `environment.yml` is the earlier Conda setup; `pyproject.toml` and `uv.lock` define the maintained environment.
+The setup uses Python 3.12.12 and uv 0.11.29. `pyproject.toml` declares dependencies and `uv.lock` records their resolved versions. `uv sync --locked` recreates the ignored `.venv` and refuses an inconsistent lockfile. Conda is not required. Installation needs internet access; the bundled dataset allows the analysis to run offline afterward.
 
-## Data and limitations
+Open the notebook in a notebook editor using `.venv` as its Python interpreter, or execute every cell with:
 
-The supplied `winequality-red.csv` contains physicochemical measurements and quality ratings from the [UCI Wine Quality dataset](https://archive.ics.uci.edu/dataset/186/wine+quality). Attribute the source dataset when reusing it. This project is for learning and has not been validated for production decisions.
+```text
+uv run --locked python verify.py --notebook
+```
 
-Notebook results depend on the split, model and evaluation settings. The dashboard does not imply deployed model performance or business impact.
+This starts a fresh kernel with the locked interpreter and writes an executed copy to ignored `verification-output/`. Add `--write-notebook` only when intentionally refreshing the checked-in outputs.
+
+## Data and interpretation
+
+The [UCI Wine Quality dataset](https://archive.ics.uci.edu/dataset/186/wine+quality) is attributed to Paulo Cortez and colleagues. Keep its source attribution when reusing it. The included red-wine CSV has 1,599 records and 12 columns; its SHA-256 is `d6a0d9bd24806944818795f22500c46cb6424cbff517aacda36595d3ed9b2daa`.
+
+The notebook removes 240 exact duplicate rows as an analytical choice, leaving 1,359. The dashboard displays all source records. Classification uses 815 training, 272 validation and 272 test rows; scaling is fitted on training rows and the decision threshold is selected on validation rows.
+
+Earlier exploration informed feature choices. Therefore, these splits are not independent external validation. The quality rating is ordinal, associations are not causal, and the notebook does not support production performance or winemaking recommendations.
 
 ## Verification
 
-On 8 September 2026, the maintained environment was checked with all 103 notebook code cells run sequentially, the dashboard's three HTTP endpoints, two plot selections and the modelling helper's held-out prediction path. Two diagnostic-plot method typos were corrected. These are execution checks, not independent validation of predictive performance or scientific conclusions. Saved notebook outputs have not been replaced.
+`verify.py` checks source dimensions, train-only preprocessing, finite model predictions, positive WLS weights, all 121 valid dashboard feature pairs, cleared/invalid selections and HTTP callback responses. `--notebook` runs all 103 code cells and checks numerical results, split separation and rendered charts. The verification workflow runs on Windows and Ubuntu. Small floating-point differences between platforms are expected; macOS is unverified.

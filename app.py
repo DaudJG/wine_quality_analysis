@@ -36,6 +36,7 @@ app.layout = html.Div([
                         dcc.Dropdown(
                             id='feature-dropdown-1',
                             options=[{'label': feature, 'value': feature} for feature in df.columns[:-1]],
+                            clearable=False,
                             value=df.columns[0]
                         )
                     ], style={'width': '48%', 'display': 'inline-block', 'paddingRight': '2%'}),
@@ -45,6 +46,7 @@ app.layout = html.Div([
                         dcc.Dropdown(
                             id='feature-dropdown-2',
                             options=[{'label': feature, 'value': feature} for feature in df.columns[:-1]],
+                            clearable=False,
                             value=df.columns[1]
                         )
                     ], style={'width': '48%', 'display': 'inline-block'})
@@ -85,6 +87,8 @@ app.layout = html.Div([
      Input('feature-dropdown-2', 'value')]
 )
 def update_plots(feature1, feature2):
+    feature1 = feature1 if feature1 in df.columns[:-1] else df.columns[0]
+    feature2 = feature2 if feature2 in df.columns[:-1] else df.columns[1]
     hist_fig = px.histogram(
         df, x=feature1, color='Quality', barmode='overlay',
         title=f'Histogram of {feature1}',

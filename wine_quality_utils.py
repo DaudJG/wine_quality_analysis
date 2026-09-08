@@ -1,3 +1,4 @@
+import itertools
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -87,7 +88,6 @@ def calculate_pearson_correlation(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Da
 def create_two_distributions_with_qqplot(data1: pd.DataFrame, data2: pd.DataFrame) -> None:
     num_features = data1.shape[1]
     plt.figure(figsize=(24, num_features * 6))
-    z = stats.norm.ppf(0.975)
     for i, column in enumerate(data1.columns):
         plt.subplot(num_features, 4, 4*i+1)
         sns.histplot(data1[column], kde=True, color='skyblue', edgecolor='black')
@@ -96,9 +96,7 @@ def create_two_distributions_with_qqplot(data1: pd.DataFrame, data2: pd.DataFram
         plt.ylabel('Count')
 
         plt.subplot(num_features, 4, 4*i+2)
-        (osm, osr), (slope, intercept, r) = stats.probplot(data1[column], dist="norm", plot=plt)
-        plt.plot(osm, intercept + slope * osm * z, ls='--', color='red')
-        plt.plot(osm, intercept - slope * osm * z, ls='--', color='red')
+        pg.qqplot(data1[column], dist='norm', confidence=0.95, ax=plt.gca())
         plt.title(f'QQ Plot of {column.replace("_", " ").title()} - Original')
 
         plt.subplot(num_features, 4, 4*i+3)
@@ -108,9 +106,7 @@ def create_two_distributions_with_qqplot(data1: pd.DataFrame, data2: pd.DataFram
         plt.ylabel('Count')
 
         plt.subplot(num_features, 4, 4*i+4)
-        (osm, osr), (slope, intercept, r) = stats.probplot(data2[column], dist="norm", plot=plt)
-        plt.plot(osm, intercept + slope * osm * z, ls='--', color='red')
-        plt.plot(osm, intercept - slope * osm * z, ls='--', color='red')
+        pg.qqplot(data2[column], dist='norm', confidence=0.95, ax=plt.gca())
         plt.title(f'QQ Plot of {column.replace("_", " ").title()} - Processed')
 
     plt.tight_layout(pad=3.0)
@@ -240,8 +236,8 @@ def fit_and_evaluate_model(X_train: pd.DataFrame, y_train: pd.Series, robust: bo
     if wls:
         ols_model = sm.OLS(y_train, X_train).fit()
         residuals_squared = ols_model.resid ** 2
-        variance_model = sm.OLS(residuals_squared, X_train).fit()
-        predicted_variance = variance_model.fittedvalues
+        variance_model = sm.OLS(np.log(np.maximum(residuals_squared, 1e-8)), X_train).fit()
+        predicted_variance = np.exp(np.clip(variance_model.fittedvalues, -20, 20))
         weights = 1 / predicted_variance
         weights = np.clip(weights, 1e-10, 1e10)
         model = sm.WLS(y_train, X_train, weights=weights).fit()
@@ -265,7 +261,7 @@ def plot_diagnostic_plots(model: sm.OLS) -> None:
     ax[0, 0].set_ylabel('Residuals')
     ax[0, 0].set_title('Residuals vs Fitted')
 
-    sm.qqplot(model.resid, line='45', ax=ax[0, 1])
+    sm.qqplot(model.resid, line='s', ax=ax[0, 1])
     ax[0, 1].set_title('Q-Q Plot')
 
     standardized_residuals = np.sqrt(np.abs(model.get_influence().resid_studentized_internal))
@@ -285,7 +281,7 @@ def plot_diagnostic_plots(model: sm.OLS) -> None:
 
     leverage_threshold = 2 * model.df_model / len(model.fittedvalues)
     for i in np.where((leverage > leverage_threshold) | (np.abs(model.get_influence().resid_studentized_internal) > 2))[0]:
-        ax[1, 1].annotate(i, (leverage[i], model.get_influence().resid_studentized_internal[i]), fontsize=8, color='red')
+        ax[1, 1].annotate(i, (leverage[i], np.asarray(model.get_influence().resid_studentized_internal)[i]), fontsize=8, color='red')
 
     plt.tight_layout()
     plt.show()
@@ -324,14 +320,7 @@ def extract_and_rank_model_metrics(model: sm.OLS, model_name: str, model_descrip
         'BIC': [bic],
     })
     
-    results_df = pd.concat([results_df, new_row], ignore_index=True)
+    results_df = new_row.copy() if results_df.empty else pd.concat([results_df, new_row], ignore_index=True)
     
-    results_df['Rank_Adj_R_squared'] = results_df['Adj_R_squared'].rank(ascending=False)
-    results_df['Rank_AIC'] = results_df['AIC'].rank(ascending=True)
-    results_df['Rank_BIC'] = results_df['BIC'].rank(ascending=True)
-    
-    results_df['Total_Rank'] = results_df[['Rank_Adj_R_squared', 'Rank_AIC', 'Rank_BIC']].sum(axis=1)
-    
-    results_df['Final_Rank'] = results_df['Total_Rank'].rank(ascending=True)
-    
+    # Keep diagnostics without ranking models fitted to different rows or likelihoods.
     return results_df

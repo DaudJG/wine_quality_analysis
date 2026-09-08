@@ -1,0 +1,19 @@
+name: Reproducibility
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  python:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: astral-sh/setup-uv@d0cc045d04ccac9d8b7881df0226f9e82c39688e
+        with:
+          version: "0.11.29"
+          enable-cache: false
+      - run: uv sync --locked --python 3.12.12
+      - run: uv run --locked python verify.py --notebook
